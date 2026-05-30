@@ -1,7 +1,7 @@
 {
   "name": "Moon Size Map",
   "short_name": "Moon Size",
-  "description": "身形友好的服装尺码与版型路线图",
+  "description": "本地优先的服装尺码与版型辅助工具",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#faf7ff",
