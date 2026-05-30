@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#8b6fd6">
+    <title>Moon Size Map</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="moon-mark" aria-hidden="true"></div>
+      <div>
+        <p class="eyebrow">身形友好的服装尺码与版型路线图</p>
+        <h1>Moon Size Map</h1>
+        <p class="tagline">尺码不是身份，版型才是地图。</p>
+      </div>
+    </header>
+
+    <nav class="tabs" aria-label="主导航">
+      <button class="tab active" data-tab="body">我的身形</button>
+      <button class="tab" data-tab="product">商品尺码表</button>
+      <button class="tab" data-tab="route">尺码路线</button>
+      <button class="tab" data-tab="tryon">试穿记录</button>
+      <button class="tab" data-tab="data">数据</button>
+    </nav>
+
+    <main>
+      <section class="panel active" id="tab-body">
+        <div class="section-heading">
+          <h2>我的身形</h2>
+          <p>保存多个时间点的身体数据，用于之后对照商品尺码表。</p>
+        </div>
+
+        <form id="body-form" class="card form-grid">
+          <div class="field date-field">
+            <label for="body-date">日期</label>
+            <button class="date-pill" type="button" data-date-button="body-date">今天</button>
+            <input class="compact-date" id="body-date" name="date" type="date">
+          </div>
+          <label class="field">身高 cm<input name="height" type="number" min="0" step="0.1" inputmode="decimal"></label>
+          <label class="field">肩宽 cm<input name="shoulder" type="number" min="0" step="0.1" inputmode="decimal"></label>
+          <label class="field">胸围 cm<input name="bust" type="number" min="0" step="0.1" inputmode="decimal"></label>
+          <label class="field">腰围 cm<input name="waist" type="number" min="0" step="0.1" inputmode="decimal"></label>
+          <label class="field">臀围 cm<input name="hip" type="number" min="0" step="0.1" inputmode="decimal"></label>
+          <label class="field">上臂围 cm，可选<input name="upperArm" type="number" min="0" step="0.1" inputmode="decimal"></label>
+          <label class="field">大腿围 cm<input name="thigh" type="number" min="0" step="0.1" inputmode="decimal"></label>
+          <label class="field">内长或常穿裤长 cm<input name="inseam" type="number" min="0" step="0.1" inputmode="decimal"></label>
+          <label class="field">常穿上衣长度 cm，可选<input name="topLength" type="number" min="0" step="0.1" inputmode="decimal"></label>
+          <label class="field">常穿裙长 cm，可选<input name="skirtLength" type="number" min="0" step="0.1" inputmode="decimal"></label>
+          <label class="field wide">备注<textarea name="notes" rows="3" placeholder="例如：喜欢宽松肩线、可接受九分裤、希望袖长更稳妥"></textarea></label>
+          <button class="primary-action wide" type="submit">保存身形记录</button>
+        </form>
+
+        <div class="list-block">
+          <h3>已保存记录</h3>
+          <div id="body-list" class="record-list"></div>
+        </div>
+      </section>
+
+      <section class="panel" id="tab-product">
+        <div class="section-heading">
+          <h2>商品尺码表</h2>
+          <p>手动录入品牌尺码表和版型信息，之后生成第一批可试尺码路线。</p>
+        </div>
+
+        <form id="product-form" class="card">
+          <div class="form-grid">
+            <label class="field">商品名<input name="name" required placeholder="例如：月光直筒牛仔裤"></label>
+            <label class="field">品牌，可选<input name="brand" placeholder="品牌名"></label>
+            <label class="field wide">链接，可选<input name="link" type="url" placeholder="https://"></label>
+            <label class="field">品类
+              <select name="category" id="category-select">
+                <option value="tops">上衣</option>
+                <option value="skirts">裙装</option>
+                <option value="pants">裤装</option>
+                <option value="outerwear">外套</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="field wide">
+            <span class="label-text">版型信息</span>
+            <div id="fit-style-chips" class="chip-grid"></div>
+          </div>
+
+          <div class="size-table-shell">
+            <div class="table-topline">
+              <h3>尺码行</h3>
+              <button id="add-size-row" class="secondary-action" type="button">添加尺码</button>
+            </div>
+            <div class="table-scroll">
+              <table id="size-table">
+                <thead></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+
+          <button class="primary-action" type="submit">保存商品尺码表</button>
+        </form>
+
+        <div class="list-block">
+          <h3>已保存商品</h3>
+          <div id="product-list" class="record-list"></div>
+        </div>
+      </section>
+
+      <section class="panel" id="tab-route">
+        <div class="section-heading">
+          <h2>尺码路线</h2>
+          <p>这不是身形评价，只是身体数据、尺码表和版型之间的匹配提示。</p>
+        </div>
+
+        <form id="analysis-form" class="card form-grid">
+          <label class="field">选择身形记录<select name="bodyId" id="analysis-body"></select></label>
+          <label class="field">选择商品尺码表<select name="productId" id="analysis-product"></select></label>
+          <button class="primary-action wide" type="submit">生成尺码路线</button>
+        </form>
+
+        <div id="analysis-output" class="route-output"></div>
+
+        <div class="list-block">
+          <h3>已保存分析</h3>
+          <div id="analysis-list" class="record-list"></div>
+        </div>
+      </section>
+
+      <section class="panel" id="tab-tryon">
+        <div class="section-heading">
+          <h2>试穿记录</h2>
+          <p>把实际试穿反馈存下来，下一次判断版型会更踏实。</p>
+        </div>
+
+        <form id="tryon-form" class="card form-grid">
+          <div class="field date-field">
+            <label for="tryon-date">日期</label>
+            <button class="date-pill" type="button" data-date-button="tryon-date">今天</button>
+            <input class="compact-date" id="tryon-date" name="date" type="date">
+          </div>
+          <label class="field">商品名<input name="productName" required></label>
+          <label class="field">品牌<input name="brand"></label>
+          <label class="field">试穿尺码<input name="sizeTried" required></label>
+          <label class="field">品类
+            <select name="category">
+              <option>上衣</option>
+              <option>裙装</option>
+              <option>裤装</option>
+              <option>外套</option>
+            </select>
+          </label>
+          <label class="field">结果
+            <select name="fitResult">
+              <option>合适</option>
+              <option>偏紧</option>
+              <option>偏松</option>
+              <option>部分合适</option>
+              <option>退货</option>
+              <option>未购买</option>
+            </select>
+          </label>
+          <div class="field wide">
+            <span class="label-text">问题清单</span>
+            <div id="issue-chips" class="chip-grid"></div>
+          </div>
+          <label class="field wide">备注<textarea name="notes" rows="3" placeholder="例如：腰围合适，但坐下时大腿活动受限"></textarea></label>
+          <button class="primary-action wide" type="submit">保存试穿记录</button>
+        </form>
+
+        <div class="list-block">
+          <h3>已保存试穿</h3>
+          <div id="tryon-list" class="record-list"></div>
+        </div>
+      </section>
+
+      <section class="panel" id="tab-data">
+        <div class="section-heading">
+          <h2>数据</h2>
+          <p>数据只保存在这个浏览器里。没有登录、上传、云同步或分析追踪。</p>
+        </div>
+
+        <div class="card data-card">
+          <h3>本地优先说明</h3>
+          <p>清理浏览器数据、更换设备、卸载浏览器或使用隐私模式，都可能删除记录。建议定期导出 JSON 备份。</p>
+          <div class="action-row">
+            <button id="export-json" class="primary-action" type="button">导出 JSON</button>
+            <label class="file-action">导入 JSON<input id="import-json" type="file" accept="application/json,.json"></label>
+            <button id="export-csv" class="secondary-action" type="button">导出 CSV</button>
+            <button id="clear-data" class="danger-action" type="button">清空本地数据</button>
+          </div>
+          <p id="data-status" class="status-text" aria-live="polite"></p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Clothing should fit the body. The body is not wrong because a size chart is crude.</p>
+    </footer>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
