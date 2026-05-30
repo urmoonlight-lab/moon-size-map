@@ -305,7 +305,9 @@ button:focus-visible {
 }
 
 .table-scroll {
+  max-width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fff;
@@ -489,6 +491,86 @@ footer {
   width: min(980px, 100%);
   margin: 0 auto;
   padding: 0 18px 28px;
+}
+
+@media (max-width: 640px) {
+  .table-topline {
+    align-items: stretch;
+  }
+
+  .table-scroll {
+    overflow-x: visible;
+    border: 0;
+    background: transparent;
+  }
+
+  table,
+  thead,
+  tbody,
+  tr,
+  td {
+    display: block;
+  }
+
+  table {
+    min-width: 0;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tbody {
+    display: grid;
+    gap: 10px;
+  }
+
+  tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  td {
+    min-width: 0;
+    border-bottom: 0;
+    padding: 0;
+  }
+
+  td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 5px;
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  td input,
+  td select {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .size-row-action {
+    display: flex;
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+
+  .size-row-action::before {
+    content: "";
+    display: none;
+  }
+
+  .icon-button {
+    width: 44px;
+    height: 44px;
+  }
 }
 
 @media (min-width: 720px) {

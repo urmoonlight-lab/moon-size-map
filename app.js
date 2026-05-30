@@ -1,5 +1,5 @@
 const STORAGE_KEY = "moon-size-map-v1";
-const VERSION = "0.1.0";
+const VERSION = "0.1.1";
 
 const CATEGORY_LABELS = {
   tops: "上衣",
@@ -239,15 +239,15 @@ function addSizeRow(category) {
   const tr = document.createElement("tr");
   tr.innerHTML = SIZE_FIELDS[category].map(([key, label]) => {
     if (["stretch", "elasticWaist", "layering"].includes(key)) {
-      return `<td><select data-field="${key}" aria-label="${label}"><option value="">未知</option><option value="yes">是</option><option value="no">否</option></select></td>`;
+      return `<td data-label="${label}"><select data-field="${key}" aria-label="${label}"><option value="">未知</option><option value="yes">是</option><option value="no">否</option></select></td>`;
     }
     if (key === "silhouette") {
-      return `<td><select data-field="${key}" aria-label="${label}"><option value="">未填</option><option>A字</option><option>H型</option><option>包臀</option><option>直筒</option><option>伞裙</option></select></td>`;
+      return `<td data-label="${label}"><select data-field="${key}" aria-label="${label}"><option value="">未填</option><option>A字</option><option>H型</option><option>包臀</option><option>直筒</option><option>伞裙</option></select></td>`;
     }
     const type = key === "label" ? "text" : "number";
     const step = key === "label" ? "" : "step=\"0.1\" min=\"0\" inputmode=\"decimal\"";
-    return `<td><input data-field="${key}" type="${type}" ${step} aria-label="${label}"></td>`;
-  }).join("") + `<td><button class="icon-button" type="button" title="删除尺码行" aria-label="删除尺码行">×</button></td>`;
+    return `<td data-label="${label}"><input data-field="${key}" type="${type}" ${step} aria-label="${label}"></td>`;
+  }).join("") + `<td class="size-row-action" data-label="操作"><button class="icon-button" type="button" title="删除尺码行" aria-label="删除尺码行">×</button></td>`;
   $(".icon-button", tr).addEventListener("click", () => tr.remove());
   $("#size-table tbody").appendChild(tr);
 }
@@ -363,7 +363,7 @@ function renderAnalysisSelectors() {
 function renderAnalysisList() {
   const list = $("#analysis-list");
   if (!state.analysisRecords.length) {
-    list.innerHTML = `<div class="empty-state">还没有保存的尺码路线。</div>`;
+    list.innerHTML = `<div class="empty-state">还没有保存的尺码路线。请先保存一条身形记录和一条商品尺码表，再生成路线。</div>`;
     return;
   }
   list.innerHTML = state.analysisRecords.map((record) => `
@@ -386,7 +386,7 @@ function renderAnalysisList() {
 function renderTryonList() {
   const list = $("#tryon-list");
   if (!state.tryonRecords.length) {
-    list.innerHTML = `<div class="empty-state">还没有试穿记录。</div>`;
+    list.innerHTML = `<div class="empty-state">还没有试穿记录。你可以在试穿后记录尺码、问题和是否退货。</div>`;
     return;
   }
   list.innerHTML = state.tryonRecords.map((record) => `
@@ -528,13 +528,24 @@ function checkLength(garmentLength, preferredLength, height, label, add) {
 
 function buildFitTips(product, checks, row) {
   const riskyText = checks.filter((check) => check.severity >= 2).map((check) => check.dimension);
+  const styles = product.fitStyles || [];
   const tips = [];
   if (riskyText.length) tips.push(`可能翻车的位置：${[...new Set(riskyText)].join("、")}。`);
-  if ((product.fitStyles || []).includes("宽松")) tips.push("宽松版型会增加活动余量，但长度和肩线仍需要单独看。");
-  if ((product.fitStyles || []).includes("无弹") || row.stretch === "no") tips.push("无弹面料建议保留更充足余量。");
-  if ((product.fitStyles || []).includes("弹力") || row.stretch === "yes") tips.push("弹力可以提高容错，但不等于红线尺寸消失。");
+  if (product.category === "tops" && (styles.includes("宽松") || styles.includes("落肩"))) {
+    tips.push("宽松或落肩版型会增加上身活动余量，但肩宽、胸围、衣长和袖长仍需要单独看。");
+  }
+  if (product.category === "pants" && styles.includes("宽松")) {
+    tips.push("宽松版型会增加活动余量，但腰围、臀围、大腿围、裆长和裤长仍需要一起对照。");
+  }
+  if (product.category === "skirts" && (styles.includes("A字") || styles.includes("宽松") || row.silhouette === "A字" || row.silhouette === "伞裙")) {
+    tips.push("A 字或宽松裙型会提高臀围容忍度，但腰围、裙长和胸围仍需要单独看。");
+  }
+  if (product.category === "outerwear") {
+    tips.push("外套需要考虑内搭空间。肩宽、胸围、袖长和衣长都可能成为关键尺寸。");
+  }
+  if (styles.includes("无弹") || row.stretch === "no") tips.push("无弹面料建议保留更充足余量。");
+  if (styles.includes("弹力") || row.stretch === "yes") tips.push("弹力可以提高容错，但不等于红线尺寸消失。");
   if (product.category === "pants") tips.push("裤装不要只看腰围，臀围、大腿围、裆长和裤长都应一起对照。");
-  if (product.category === "outerwear") tips.push("外套需要考虑叠穿，肩宽和袖长优先级较高。");
   return tips;
 }
 
