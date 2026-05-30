@@ -1,4 +1,4 @@
-const CACHE_NAME = "moon-size-map-v1.0.3";
+const CACHE_NAME = "moon-size-map-v1.1.1";
 const ASSETS = [
   "./",
   "./index.html",
